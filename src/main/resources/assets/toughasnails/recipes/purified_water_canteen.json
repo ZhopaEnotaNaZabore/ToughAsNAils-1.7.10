@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "toughasnails:charcoal_filter"
+    },
+    {
+      "item": "toughasnails:canteen",
+      "data": 1
+    }
+  ],
+  "result": {
+    "item": "toughasnails:canteen",
+    "data": 2
+  }
+}

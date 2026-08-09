@@ -1,0 +1,42 @@
+[
+  {
+    "state": {
+      "block": "toughasnails:campfire",
+      "metadata": 1,
+      "metadataMask": 1
+    },
+    "temperature": 5.0
+  },
+  {
+    "state": {
+      "block": "minecraft:lit_furnace",
+      "metadata": 0,
+      "metadataMask": 0
+    },
+    "temperature": 3.0
+  },
+  {
+    "state": {
+      "block": "minecraft:lava",
+      "metadata": 0,
+      "metadataMask": 0
+    },
+    "temperature": 15.0
+  },
+  {
+    "state": {
+      "block": "minecraft:flowing_lava",
+      "metadata": 0,
+      "metadataMask": 0
+    },
+    "temperature": 15.0
+  },
+  {
+    "state": {
+      "block": "minecraft:netherrack",
+      "metadata": 0,
+      "metadataMask": 0
+    },
+    "temperature": 12.5
+  }
+]
