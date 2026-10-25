@@ -25,6 +25,7 @@ public class ModPotions
         cold_resistance = registerPotion(new PotionColdResistance(27).setPotionName("potion.cold_resistance"));
         heat_resistance = registerPotion(new PotionHeatResistance(28).setPotionName("potion.heat_resistance"));
         hydration = registerPotion(new PotionHydration(29).setPotionName("potion.hydration"));
+        toughasnails.util.PotionBrewingRecipe.register();
     }
 
     private static Potion registerPotion(Potion potion)

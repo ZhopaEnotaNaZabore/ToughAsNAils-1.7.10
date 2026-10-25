@@ -33,6 +33,7 @@ public class ExtendedStatHandler
     @SubscribeEvent
     public void onPlayerClone(Clone event)
     {
+        if (event.wasDeath) return;
         for (String identifier : PlayerStatRegistry.getPlayerStats().keySet())
         {
             IPlayerStat oldStat = PlayerStatRegistry.getStat(event.original, identifier);
@@ -40,6 +41,12 @@ public class ExtendedStatHandler
             if (oldStat != null && newStat != null)
                 PlayerStatRegistry.readNBT(identifier, newStat, PlayerStatRegistry.writeNBT(identifier, oldStat));
         }
+    }
+
+    @SubscribeEvent
+    public void onPlayerRespawn(cpw.mods.fml.common.gameevent.PlayerEvent.PlayerRespawnEvent event)
+    {
+        onPlayerLogin(new PlayerLoggedInEvent(event.player));
     }
 
     @SubscribeEvent

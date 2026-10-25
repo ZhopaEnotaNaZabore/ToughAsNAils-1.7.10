@@ -22,6 +22,8 @@ public class ThirstHandler extends StatHandlerBase implements IThirst
 {
     private int thirstLevel;
     private int prevThirstLevel;
+    private float prevHydration;
+    private float prevExhaustion;
     private float thirstHydrationLevel;
     private float thirstExhaustionLevel;
     
@@ -127,13 +129,17 @@ public class ThirstHandler extends StatHandlerBase implements IThirst
     @Override
     public boolean hasChanged()
     {
-        return this.prevThirstLevel != this.thirstLevel;
+        return this.prevThirstLevel != this.thirstLevel
+                || Float.compare(prevHydration, thirstHydrationLevel) != 0
+                || Float.compare(prevExhaustion, thirstExhaustionLevel) != 0;
     }
     
     @Override
     public void onSendClientUpdate()
     {
         this.prevThirstLevel = this.thirstLevel;
+        this.prevHydration = this.thirstHydrationLevel;
+        this.prevExhaustion = this.thirstExhaustionLevel;
     }
     
     @Override

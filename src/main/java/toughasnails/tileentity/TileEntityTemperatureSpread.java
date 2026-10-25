@@ -49,6 +49,7 @@ public class TileEntityTemperatureSpread extends TileEntity implements ITemperat
     @Override
     public void updateEntity()
     {
+        if (worldObj.isRemote) return;
         if ((worldObj.getBlockMetadata(xCoord, yCoord, zCoord) & 8) == 0)
         {
             reset();

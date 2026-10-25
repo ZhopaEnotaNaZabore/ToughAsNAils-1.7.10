@@ -35,4 +35,14 @@ public class PotionHydration extends TANPotion
     {
         return true;
     }
+
+    @Override
+    public void affectEntity(EntityLivingBase source, EntityLivingBase target, int amplifier, double strength)
+    {
+        if (target instanceof EntityPlayer && !target.worldObj.isRemote)
+        {
+            int amount = (int)Math.round((amplifier + 1) * strength);
+            if (amount > 0) ThirstHelper.getThirstData((EntityPlayer)target).addStats(amount, 1.0F);
+        }
+    }
 }

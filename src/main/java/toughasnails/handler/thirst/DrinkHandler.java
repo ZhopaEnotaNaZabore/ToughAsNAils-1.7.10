@@ -85,6 +85,9 @@ public class DrinkHandler
 
     public static void tryDrinkWaterInWorld(EntityPlayer player, boolean client)
     {
+        if (!player.isEntityAlive() || !player.isSneaking() || player.getCurrentEquippedItem() != null
+                || !SyncedConfig.getBooleanValue(GameplayOption.ENABLE_THIRST)
+                || ThirstHelper.getThirstData(player).getThirst() >= 20) return;
         TargetWater target = getRightClickedWater(player);
         if (target == null) return;
 

@@ -15,7 +15,6 @@ import toughasnails.api.TANCapabilities;
 import toughasnails.api.TANPotions;
 import toughasnails.api.config.GameplayOption;
 import toughasnails.api.config.SyncedConfig;
-import toughasnails.api.config.TemperatureOption;
 import toughasnails.api.stat.StatHandlerBase;
 import toughasnails.api.stat.PlayerStatRegistry;
 import toughasnails.api.stat.capability.ITemperature;
@@ -25,9 +24,7 @@ import toughasnails.network.message.MessageUpdateStat;
 import toughasnails.temperature.modifier.*;
 import toughasnails.temperature.modifier.TemperatureModifier.ExternalModifier;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import static toughasnails.api.temperature.TemperatureHelper.registerTemperatureModifier;
@@ -37,6 +34,10 @@ public class TemperatureHandler extends StatHandlerBase implements ITemperature
     private int temperatureLevel;
     private int prevTemperatureLevel;
     private int temperatureTimer;
+    private int modifierClock;
+
+    public int getModifierClock() { return modifierClock; }
+    public void setModifierClock(int value) { modifierClock = value; }
     private Map<String, TemperatureModifier.ExternalModifier> externalModifiers;
     
     public final TemperatureDebugger debugger = new TemperatureDebugger();
@@ -67,31 +68,15 @@ public class TemperatureHandler extends StatHandlerBase implements ITemperature
 
         if (phase == Phase.END && !world.isRemote)
         {
+            tickModifiers();
             int targetTemperature = getPlayerTarget(player);
-            int tempChangeTicks = TemperatureScale.getRateForTemperatures(temperatureLevel, targetTemperature);
+            int tempChangeTicks = getChangeTicks(targetTemperature);
 
             boolean incrementTemperature = ++temperatureTimer >= tempChangeTicks;
             boolean updateClient = ++debugger.debugTimer % 5 == 0;
 
             debugger.temperatureTimer = temperatureTimer;
             debugger.changeTicks = tempChangeTicks;
-
-            Iterator<Map.Entry<String, ExternalModifier>> it = externalModifiers.entrySet().iterator();
-
-            List<String> toRemove=new ArrayList<String>();
-
-            while (it.hasNext())
-            {
-                Map.Entry<String, ExternalModifier> entry = it.next();
-
-                if (entry.getValue().getEndTime() < this.temperatureTimer)
-                {
-                    toRemove.add(entry.getKey());
-                }
-            }
-            for(String removeEntry: toRemove) {
-                this.externalModifiers.remove(removeEntry);
-            }
 
             if (incrementTemperature)
             {
@@ -112,6 +97,21 @@ public class TemperatureHandler extends StatHandlerBase implements ITemperature
                 debugger.finalize((EntityPlayerMP)player);
             }
         }
+    }
+
+    private int getChangeTicks(int targetTemperature)
+    {
+        int ticks = TemperatureScale.getRateForTemperatures(temperatureLevel, targetTemperature);
+        for (ExternalModifier modifier : externalModifiers.values()) ticks += modifier.getRate();
+        return Math.max(20, ticks);
+    }
+
+    private void tickModifiers()
+    {
+        Iterator<ExternalModifier> active = externalModifiers.values().iterator();
+        while (active.hasNext())
+            if (active.next().getEndTime() <= modifierClock) active.remove();
+        ++modifierClock;
     }
 
     @Override
@@ -216,11 +216,11 @@ public class TemperatureHandler extends StatHandlerBase implements ITemperature
             ExternalModifier modifier = this.externalModifiers.get(name);
             modifier.setAmount(amount);
             modifier.setRate(rate);
-            modifier.setEndTime(this.temperatureTimer + duration);
+            modifier.setEndTime(this.modifierClock + duration);
         }
         else
         {
-            TemperatureModifier.ExternalModifier modifier = new TemperatureModifier.ExternalModifier(name, amount, rate, this.temperatureTimer + duration);
+            TemperatureModifier.ExternalModifier modifier = new TemperatureModifier.ExternalModifier(name, amount, rate, this.modifierClock + duration);
             this.externalModifiers.put(name, modifier);
         }
     }

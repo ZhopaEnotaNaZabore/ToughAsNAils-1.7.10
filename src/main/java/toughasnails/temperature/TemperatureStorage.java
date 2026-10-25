@@ -28,6 +28,8 @@ public class TemperatureStorage implements IStatStorage<ITemperature>
         
         compound.setInteger("temperatureLevel", instance.getTemperature().getRawValue());
         compound.setInteger("temperatureTimer", instance.getChangeTime());
+        if (instance instanceof TemperatureHandler)
+            compound.setInteger("ModifierClock", ((TemperatureHandler)instance).getModifierClock());
         
         NBTTagList externalModifierList = new NBTTagList();
         for (ExternalModifier modifier : instance.getExternalModifiers().values())
@@ -46,6 +48,9 @@ public class TemperatureStorage implements IStatStorage<ITemperature>
         {
             instance.setTemperature(new Temperature(compound.getInteger("temperatureLevel")));
             instance.setChangeTime(compound.getInteger("temperatureTimer"));
+            if (instance instanceof TemperatureHandler)
+                ((TemperatureHandler)instance).setModifierClock(compound.hasKey("ModifierClock")
+                        ? compound.getInteger("ModifierClock") : compound.getInteger("temperatureTimer"));
             
             NBTTagList externalModifierTagList = compound.getTagList("ExternalModifiers", Constants.NBT.TAG_COMPOUND);
             Map<String, ExternalModifier> externalModifierList = Maps.newHashMap();
